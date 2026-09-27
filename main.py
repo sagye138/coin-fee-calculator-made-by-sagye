@@ -12,6 +12,7 @@ st.markdown(
         font-size: 1.15rem !important;
         font-weight: 800 !important;
         border-radius: 10px !important;
+        padding: 0 !important;
     }
     div[data-baseweb="input"] {
         min-height: 3.6rem !important;
@@ -103,10 +104,9 @@ def parse_int(s: str) -> int:
 
 
 # ⭐ 실시간 환율 API (야후 파이낸스 실시간 데이터로 교체)
-@st.cache_data(ttl=30)  # 30초 주기로 캐시 갱신 (더 실시간에 가깝게)
+@st.cache_data(ttl=30)
 def fetch_usd_krw_rate():
   try:
-    # 1순위: 야후 파이낸스 (거의 실시간)
     url = "https://query1.finance.yahoo.com/v8/finance/chart/KRW=X"
     headers = {
         "User-Agent": (
@@ -119,12 +119,11 @@ def fetch_usd_krw_rate():
     return float(data["chart"]["result"][0]["meta"]["regularMarketPrice"])
   except Exception:
     try:
-      # 2순위: 기존 Open API (야후 파이낸스 접속 실패 시 예비용)
       url = "https://open.er-api.com/v6/latest/USD"
       res = requests.get(url, timeout=5)
       return float(res.json()["rates"]["KRW"])
     except Exception:
-      return 1350.0  # 모두 실패 시 기본값
+      return 1350.0
 
 
 # 세션 상태 초기화
@@ -295,34 +294,35 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# 금액 조절 버튼 단위 수정 (100원, 1000원, 10000원, 100000원)
 btn_n = st.columns(5)
 btn_n[0].button(
-    "+1만",
+    "+100원",
+    on_click=add_to_n,
+    args=(100,),
+    use_container_width=True,
+    key="btn_n_100",
+)
+btn_n[1].button(
+    "+1천원",
+    on_click=add_to_n,
+    args=(1000,),
+    use_container_width=True,
+    key="btn_n_1000",
+)
+btn_n[2].button(
+    "+1만원",
     on_click=add_to_n,
     args=(10000,),
     use_container_width=True,
-    key="btn_n_1man",
+    key="btn_n_10000",
 )
-btn_n[1].button(
-    "+5만",
-    on_click=add_to_n,
-    args=(50000,),
-    use_container_width=True,
-    key="btn_n_5man",
-)
-btn_n[2].button(
-    "+10만",
+btn_n[3].button(
+    "+10만원",
     on_click=add_to_n,
     args=(100000,),
     use_container_width=True,
-    key="btn_n_10man",
-)
-btn_n[3].button(
-    "+100만",
-    on_click=add_to_n,
-    args=(1000000,),
-    use_container_width=True,
-    key="btn_n_100man",
+    key="btn_n_100000",
 )
 btn_n[4].button(
     "초기화", on_click=reset_n, use_container_width=True, key="btn_n_reset"
@@ -341,34 +341,35 @@ st.text_input(
 )
 final_val = parse_int(st.session_state.final_str)
 
+# 금액 조절 버튼 단위 수정 (100원, 1000원, 10000원, 100000원)
 btn_f = st.columns(5)
 btn_f[0].button(
-    "+1만",
+    "+100원",
+    on_click=add_to_final,
+    args=(100,),
+    use_container_width=True,
+    key="btn_f_100",
+)
+btn_f[1].button(
+    "+1천원",
+    on_click=add_to_final,
+    args=(1000,),
+    use_container_width=True,
+    key="btn_f_1000",
+)
+btn_f[2].button(
+    "+1만원",
     on_click=add_to_final,
     args=(10000,),
     use_container_width=True,
-    key="btn_f_1man",
+    key="btn_f_10000",
 )
-btn_f[1].button(
-    "+5만",
-    on_click=add_to_final,
-    args=(50000,),
-    use_container_width=True,
-    key="btn_f_5man",
-)
-btn_f[2].button(
-    "+10만",
+btn_f[3].button(
+    "+10만원",
     on_click=add_to_final,
     args=(100000,),
     use_container_width=True,
-    key="btn_f_10man",
-)
-btn_f[3].button(
-    "+100만",
-    on_click=add_to_final,
-    args=(1000000,),
-    use_container_width=True,
-    key="btn_f_100man",
+    key="btn_f_100000",
 )
 btn_f[4].button(
     "초기화", on_click=reset_final, use_container_width=True, key="btn_f_reset"
